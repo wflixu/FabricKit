@@ -14,19 +14,11 @@
 			remoteGlobalIDString = 5CD9A14D2DAAB730003C8683;
 			remoteInfo = Fabric;
 		};
-		5CD9A16A2DAAB732003C8683 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 5CD9A1462DAAB730003C8683 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5CD9A14D2DAAB730003C8683;
-			remoteInfo = Fabric;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		5CD9A14E2DAAB730003C8683 /* Fabric.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fabric.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5CD9A15F2DAAB732003C8683 /* FabricTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FabricTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		5CD9A1692DAAB732003C8683 /* FabricUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FabricUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -70,13 +62,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5CD9A1662DAAB732003C8683 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -94,7 +79,6 @@
 			children = (
 				5CD9A14E2DAAB730003C8683 /* Fabric.app */,
 				5CD9A15F2DAAB732003C8683 /* FabricTests.xctest */,
-				5CD9A1692DAAB732003C8683 /* FabricUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -147,26 +131,6 @@
 			productReference = 5CD9A15F2DAAB732003C8683 /* FabricTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		5CD9A1682DAAB732003C8683 /* FabricUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 5CD9A1792DAAB732003C8683 /* Build configuration list for PBXNativeTarget "FabricUITests" */;
-			buildPhases = (
-				5CD9A1652DAAB732003C8683 /* Sources */,
-				5CD9A1662DAAB732003C8683 /* Frameworks */,
-				5CD9A1672DAAB732003C8683 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				5CD9A16B2DAAB732003C8683 /* PBXTargetDependency */,
-			);
-			name = FabricUITests;
-			packageProductDependencies = (
-			);
-			productName = FabricUITests;
-			productReference = 5CD9A1692DAAB732003C8683 /* FabricUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -181,10 +145,6 @@
 						CreatedOnToolsVersion = 16.2;
 					};
 					5CD9A15E2DAAB732003C8683 = {
-						CreatedOnToolsVersion = 16.2;
-						TestTargetID = 5CD9A14D2DAAB730003C8683;
-					};
-					5CD9A1682DAAB732003C8683 = {
 						CreatedOnToolsVersion = 16.2;
 						TestTargetID = 5CD9A14D2DAAB730003C8683;
 					};
@@ -206,7 +166,6 @@
 			targets = (
 				5CD9A14D2DAAB730003C8683 /* Fabric */,
 				5CD9A15E2DAAB732003C8683 /* FabricTests */,
-				5CD9A1682DAAB732003C8683 /* FabricUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -220,13 +179,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		5CD9A15D2DAAB732003C8683 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		5CD9A1672DAAB732003C8683 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -250,13 +202,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5CD9A1652DAAB732003C8683 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -264,11 +209,6 @@
 			isa = PBXTargetDependency;
 			target = 5CD9A14D2DAAB730003C8683 /* Fabric */;
 			targetProxy = 5CD9A1602DAAB732003C8683 /* PBXContainerItemProxy */;
-		};
-		5CD9A16B2DAAB732003C8683 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 5CD9A14D2DAAB730003C8683 /* Fabric */;
-			targetProxy = 5CD9A16A2DAAB732003C8683 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -481,38 +421,6 @@
 			};
 			name = Release;
 		};
-		5CD9A17A2DAAB732003C8683 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4L3563XCBN;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = cn.wflixu.FabricUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = Fabric;
-			};
-			name = Debug;
-		};
-		5CD9A17B2DAAB732003C8683 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4L3563XCBN;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = cn.wflixu.FabricUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = Fabric;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -539,15 +447,6 @@
 			buildConfigurations = (
 				5CD9A1772DAAB732003C8683 /* Debug */,
 				5CD9A1782DAAB732003C8683 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		5CD9A1792DAAB732003C8683 /* Build configuration list for PBXNativeTarget "FabricUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5CD9A17A2DAAB732003C8683 /* Debug */,
-				5CD9A17B2DAAB732003C8683 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
