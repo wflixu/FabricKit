@@ -1,0 +1,41 @@
+# Xcode
+.DS_Store
+*/xcuserdata
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+*.xcscheme
+DerivedData/
+Build/
+
+# Swift Package Manager
+.swiftpm
+.build/
+
+# AppCode
+.idea/
+
+# macOS
+.DS_Store
+
+# Swift
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Local development
+.env
+.local
+
+# Dependency directories
+Pods/
+Carthage/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output

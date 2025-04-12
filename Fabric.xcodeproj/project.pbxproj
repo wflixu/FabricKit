@@ -29,20 +29,28 @@
 		5CD9A1692DAAB732003C8683 /* FabricUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FabricUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5CD9A1812DAAB8FB003C8683 /* Exceptions for "Fabric" folder in "FabricTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppState.swift,
+			);
+			target = 5CD9A15E2DAAB732003C8683 /* FabricTests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5CD9A1502DAAB730003C8683 /* Fabric */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5CD9A1812DAAB8FB003C8683 /* Exceptions for "Fabric" folder in "FabricTests" target */,
+			);
 			path = Fabric;
 			sourceTree = "<group>";
 		};
 		5CD9A1622DAAB732003C8683 /* FabricTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FabricTests;
-			sourceTree = "<group>";
-		};
-		5CD9A16C2DAAB732003C8683 /* FabricUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = FabricUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -77,7 +85,6 @@
 			children = (
 				5CD9A1502DAAB730003C8683 /* Fabric */,
 				5CD9A1622DAAB732003C8683 /* FabricTests */,
-				5CD9A16C2DAAB732003C8683 /* FabricUITests */,
 				5CD9A14F2DAAB730003C8683 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -152,9 +159,6 @@
 			);
 			dependencies = (
 				5CD9A16B2DAAB732003C8683 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				5CD9A16C2DAAB732003C8683 /* FabricUITests */,
 			);
 			name = FabricUITests;
 			packageProductDependencies = (

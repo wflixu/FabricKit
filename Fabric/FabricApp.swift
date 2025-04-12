@@ -6,6 +6,10 @@
 //
 
 import SwiftUI
+import OSLog
+import Combine
+
+let logger = Logger(subsystem: "com.wflixu.fabric", category: "FabricApp")
 
 @main
 struct FabricApp: App {
