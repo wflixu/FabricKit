@@ -13,6 +13,17 @@ enum AnnotationType {
     case rect
     case text
     case arrow
+
+    var desc: String {
+        switch self {
+        case .rect:
+            return "矩形"
+        case .text:
+            return "文本"
+        case .arrow:
+            return "箭头"
+        }
+    }
 }
 
 // 标注数据结构
@@ -24,6 +35,8 @@ struct Annotation: Identifiable {
     var lineWidth: CGFloat = 2
     var text: String = ""
     var active: Bool = false
+    var start: CGPoint = .zero
+    var offset: CGSize = .zero
 }
 
 struct CanvasView: View {
@@ -40,6 +53,8 @@ struct CanvasView: View {
 
     @ObservedObject var state: EditorState
 
+    @Binding var annotationType: AnnotationType
+
     var onSaveImage: (_ data: CGImage) -> Void
 
     // 修改为计算属性
@@ -48,7 +63,21 @@ struct CanvasView: View {
     }
 
     var activeAnnotation: Annotation? {
-        return annotations.first { $0.active } ?? annotations.last
+        if showActiveFrame {
+            return Annotation(
+                type: annotationType,
+                frame: CGRect(
+                    x: dragStart.x,
+                    y: dragStart.y,
+                    width: abs(dragOffset.width),
+                    height: abs(dragOffset.height)
+                ),
+                start: dragStart,
+                offset: dragOffset
+            )
+        } else {
+            return annotations.first { $0.active } ?? annotations.last
+        }
     }
 
     // 计算属性：过滤出未激活的标注
@@ -154,13 +183,15 @@ struct CanvasView: View {
             }
             .onEnded { _ in
                 self.annotations.append(Annotation(
-                    type: .rect,
+                    type: self.annotationType,
                     frame: CGRect(
                         x: dragStart.x,
                         y: dragStart.y,
                         width: dragOffset.width,
                         height: dragOffset.height
-                    )
+                    ),
+                    start: dragStart,
+                    offset: dragOffset
                 ))
                 dragStart = .zero
                 dragOffset = .zero
@@ -188,8 +219,8 @@ struct CanvasView: View {
 
     // 绘制箭头
     private func drawArrow(context: GraphicsContext, annotation: Annotation, size: CGSize) {
-        let start = CGPoint(x: annotation.frame.minX, y: annotation.frame.minY)
-        let end = CGPoint(x: annotation.frame.maxX, y: annotation.frame.maxY)
+        let start = annotation.start
+        let end = CGPoint(x: start.x + annotation.offset.width, y: start.y + annotation.offset.height)
 
         // 绘制主线
         var path = Path()
@@ -239,9 +270,99 @@ struct ActiveAnnotation: View {
     }
 
     var body: some View {
-        Rectangle()
+        if annotation.type == .rect {
+            Rectangle()
+                .stroke(Color.black, lineWidth: 6)
+                .fill(Color.black.opacity(0.01))
+                .offset(offset)
+                .highPriorityGesture(
+                    DragGesture(minimumDistance: 5.0, coordinateSpace: .named("Canvas"))
+                        .onChanged { event in
+                            // 记录拖动起始位置
+                            if sartPoint == .zero {
+                                sartPoint = event.startLocation
+                            }
+                            // 计算偏移量
+                            offset = event.translation
+
+                            logger.info("拖动中 - 坐标: (\(event.location.x), \(event.location.y)) , 偏移: \(event.translation.width), \(event.translation.height)")
+                        }
+                        .onEnded { _ in
+                            // 重置起始位置和偏移
+                            movingAnnotation(offset)
+                            sartPoint = .zero
+                            offset = .zero
+                        }
+                )
+                .frame(width: livingSize.width, height: livingSize.height)
+                //  绘制 8 个控制点圆环
+                .overlay(
+                    ForEach(controlPoints, id: \.self) { cpoint in
+                        Circle()
+                            .fill(Color.blue)
+                            .frame(width: 12, height: 12)
+                            .onHover(perform: { hovering in
+                                if hovering {
+                                    setCursorbyIndex(cpoint)
+                                } else {
+                                    NSCursor.pop()
+                                }
+                            }
+                            )
+                            .position(cpoint.position(self.livingSize))
+                            .offset(offset)
+                            .gesture(
+                                DragGesture(minimumDistance: 3, coordinateSpace: .named("Canvas"))
+                                    .onChanged { event in
+                                        logger.info("拖动中 - 坐标: (\(event.location.x), \(event.location.y)) , 偏移: \(event.translation.width), \(event.translation.height) 起点：\(event.startLocation.x), \(event.startLocation.y)")
+
+                                        // 计算新的宽高
+                                        changeSize = cpoint.getTargetChangedSize(event.translation)
+                                        offset = cpoint.getViewOffset(event.translation)
+                                    }
+                                    .onEnded { event in
+                                        let size: CGSize = cpoint.getTargetChangedSize(event.translation)
+                                        let trans: CGSize = cpoint.getOriginTrans(event.translation)
+                                        // 计算新的宽高
+                                        onUpdateFrame(trans, size)
+                                        changeSize = .zero
+                                        offset = .zero
+                                    }
+                            )
+                    }
+                )
+                .overlay(
+                    Text("ann offset: \(offset.width), \(offset.height) ; size: \(changeSize.width), \(changeSize.height)")
+                )
+        } else if annotation.type == .arrow {
+            Path { path in
+                let start =  CGPoint(
+                    x:offset.width > 0 ? 0 : -offset.width,
+                    y:offset.height > 0 ? 0 : -offset.height
+                )
+                let end = CGPoint(x: start.x + annotation.offset.width, y: start.y + annotation.offset.height)
+                path.move(to: start)
+                path.addLine(to: end)
+
+                // 绘制箭头头部
+                let angle = atan2(end.y - start.y, end.x - start.x)
+                let arrowLength: CGFloat = 10
+
+                path.move(to: end)
+                path.addLine(to: CGPoint(
+                    x: end.x - arrowLength * cos(angle - .pi/6),
+                    y: end.y - arrowLength * sin(angle - .pi/6)
+                ))
+
+                path.addLine(to: CGPoint(
+                    x: end.x - arrowLength * cos(angle + .pi/6),
+                    y: end.y - arrowLength * sin(angle + .pi/6)
+                ))
+
+                path.closeSubpath()
+            }
             .stroke(Color.black, lineWidth: 6)
-            .fill(Color.black.opacity(0.01))
+            .frame(width: livingSize.width, height: livingSize.height)
             .offset(offset)
             .highPriorityGesture(
                 DragGesture(minimumDistance: 5.0, coordinateSpace: .named("Canvas"))
@@ -253,8 +374,6 @@ struct ActiveAnnotation: View {
                         // 计算偏移量
                         offset = event.translation
 
-//                        movingAnnotation(offset)
-
                         logger.info("拖动中 - 坐标: (\(event.location.x), \(event.location.y)) , 偏移: \(event.translation.width), \(event.translation.height)")
                     }
                     .onEnded { _ in
@@ -264,46 +383,16 @@ struct ActiveAnnotation: View {
                         offset = .zero
                     }
             )
-            .frame(width: livingSize.width, height: livingSize.height)
-//         绘制 8 个控制点圆环
-            .overlay(
-                ForEach(controlPoints, id: \.self) { cpoint in
-                    Circle()
-                        .fill(Color.blue)
-                        .frame(width: 12, height: 12)
-                        .onHover(perform: { hovering in
-                            if hovering {
-                                setCursorbyIndex(cpoint)
-                            } else {
-                                NSCursor.pop()
-                            }
-                        }
-                        )
-                        .position(cpoint.position(self.livingSize))
-                        .offset(offset)
-                        .gesture(
-                            DragGesture(minimumDistance: 3, coordinateSpace: .named("Canvas"))
-                                .onChanged { event in
-                                    logger.info("拖动中 - 坐标: (\(event.location.x), \(event.location.y)) , 偏移: \(event.translation.width), \(event.translation.height) 起点：\(event.startLocation.x), \(event.startLocation.y)")
+        }
+//
+    }
 
-                                    // 计算新的宽高
-                                    changeSize = cpoint.getTargetChangedSize(event.translation)
-                                    offset = cpoint.getViewOffset(event.translation)
-                                }
-                                .onEnded { event in
-                                    let size: CGSize = cpoint.getTargetChangedSize(event.translation)
-                                    let trans: CGSize = cpoint.getOriginTrans(event.translation)
-                                    // 计算新的宽高
-                                    onUpdateFrame(trans, size)
-                                    changeSize = .zero
-                                    offset = .zero
-                                }
-                        )
-                }
-            )
-            .overlay(
-                Text("ann offset: \(offset.width), \(offset.height) ; size: \(changeSize.width), \(changeSize.height)")
-            )
+    func getArrowStartPoint( _ offset: CGSize) -> CGPoint {
+        return CGPoint(
+            x:offset.width > 0 ? 0 : -offset.width,
+            y:offset.height > 0 ? 0 : -offset.height
+        )
+        
     }
 
     func movingAnnotation(_ offset: CGSize) {
@@ -315,7 +404,7 @@ struct ActiveAnnotation: View {
     func resizeAnnotationFrame(_ size: CGSize) {
         onUpdateFrame(.zero, size)
     }
-    
+
     func setCursorbyIndex(_ cp: CPoint) {
         NSCursor.frameResize(position: cp.frameResizePosition, directions: .all).push()
     }

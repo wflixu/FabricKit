@@ -9,14 +9,23 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var editorState = EditorState()
+    @State var annotationType: AnnotationType = .rect
+
     var body: some View {
         VStack {
             HStack {
                 Button("Save") {
                     editorState.saving = true
                 }
+                Button("Arrow") {
+                    annotationType = .arrow
+                }
+                Button("Rectangle") {
+                    annotationType = .rect
+                }
+                Text("当前选中类型: \(annotationType.desc)")
             }
-            CanvasView(state: editorState) { data in
+            CanvasView(state: editorState, annotationType: $annotationType) { data in
                 onSave(data)
                 editorState.saving = false
                 logger.info("点击了:  save")
