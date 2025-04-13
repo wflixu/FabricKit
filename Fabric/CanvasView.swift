@@ -229,27 +229,13 @@ struct ActiveAnnotation: View {
     var onUpdateFrame: (CGSize, CGSize) -> Void
 
     // 计算矩形 8 个控制点的位置
-    var controls: [CGPoint] {
-        let frame = annotation.frame
-        let width = frame.width + changeSize.width
-        let height = frame.height + changeSize.height
+    var controlPoints: [CPoint] {
+        return [.topLeft, .top, .topRight, .left, .right, .bottomLeft, .bottom, .bottomRight]
+    }
 
-        // 如果宽度或高度为 0，返回空数组
-        guard width > 0, height > 0 else { return [] }
-
-        // 按照顺时针顺序返回控制点:
-        // 左上、右上、右下、左下
-        // 上中、右中、下中、左中
-        return [
-            .init(x: 0, y: 0), // 左上
-            .init(x: width/2, y: 0), // 上中
-            .init(x: width, y: 0), // 右上
-            .init(x: 0, y: height/2), // 左中
-            .init(x: width, y: height/2), // 右中
-            .init(x: 0, y: height), // 左下
-            .init(x: width/2, y: height), // 下中
-            .init(x: width, y: height), // 右下
-        ]
+    var livingSize: CGSize {
+        let originSize = annotation.frame.size
+        return CGSize(width: originSize.width + changeSize.width, height: originSize.height + changeSize.height)
     }
 
     var body: some View {
@@ -278,93 +264,59 @@ struct ActiveAnnotation: View {
                         offset = .zero
                     }
             )
-            .frame(width: annotation.frame.width + changeSize.width, height: annotation.frame.height + changeSize.height)
+            .frame(width: livingSize.width, height: livingSize.height)
 //         绘制 8 个控制点圆环
             .overlay(
-                ForEach(controls.indices, id: \.self) { index in
+                ForEach(controlPoints, id: \.self) { cpoint in
                     Circle()
                         .fill(Color.blue)
                         .frame(width: 12, height: 12)
                         .onHover(perform: { hovering in
                             if hovering {
-                                logger.info("鼠标悬停在控制点 \(index)")
-                                setCursorbyIndex(index)
+                                setCursorbyIndex(cpoint)
                             } else {
                                 NSCursor.pop()
                             }
                         }
                         )
-                        .position(controls[index])
+                        .position(cpoint.position(self.livingSize))
                         .offset(offset)
                         .gesture(
                             DragGesture(minimumDistance: 3, coordinateSpace: .named("Canvas"))
                                 .onChanged { event in
                                     logger.info("拖动中 - 坐标: (\(event.location.x), \(event.location.y)) , 偏移: \(event.translation.width), \(event.translation.height) 起点：\(event.startLocation.x), \(event.startLocation.y)")
-                                    let size = sizeByIndexAndTrans(index, event.translation)
+
                                     // 计算新的宽高
-                                    changeSize = size
+                                    changeSize = cpoint.getTargetChangedSize(event.translation)
+                                    offset = cpoint.getViewOffset(event.translation)
                                 }
                                 .onEnded { event in
-                                    let size = sizeByIndexAndTrans(index, event.translation)
+                                    let size: CGSize = cpoint.getTargetChangedSize(event.translation)
+                                    let trans: CGSize = cpoint.getOriginTrans(event.translation)
                                     // 计算新的宽高
-                                    resizeAnnotationFrame(size)
+                                    onUpdateFrame(trans, size)
                                     changeSize = .zero
+                                    offset = .zero
                                 }
                         )
                 }
+            )
+            .overlay(
+                Text("ann offset: \(offset.width), \(offset.height) ; size: \(changeSize.width), \(changeSize.height)")
             )
     }
 
     func movingAnnotation(_ offset: CGSize) {
         // 通过回调通知父视图更新frame
+        logger.warning("movingAnnotation ......")
         onUpdateFrame(offset, .zero)
     }
 
     func resizeAnnotationFrame(_ size: CGSize) {
         onUpdateFrame(.zero, size)
     }
-
-    func sizeByIndexAndTrans(_ index: Int, _ trans: CGSize) -> CGSize {
-        var width: CGFloat = 0
-        var height: CGFloat = 0
-        switch index {
-        case 0, 2, 5, 7:
-            width = trans.width
-            height = trans.height
-        case 1, 6:
-            width = 0
-            height = trans.height
-        case 3, 4:
-            width = trans.width
-            height = 0
-        default:
-            width = 0
-            height = 0
-        }
-
-        return CGSize(width: width, height: height)
-    }
-
-    func setCursorbyIndex(_ index: Int) {
-        switch index {
-        case 0:
-            NSCursor.frameResize(position: .topLeft, directions: .all).push()
-        case 1:
-            NSCursor.frameResize(position: .top, directions: .all).push()
-        case 2:
-            NSCursor.frameResize(position: .topRight, directions: .all).push()
-        case 3:
-            NSCursor.frameResize(position: .left, directions: .all).push()
-        case 4:
-            NSCursor.frameResize(position: .right, directions: .all).push()
-        case 5:
-            NSCursor.frameResize(position: .bottomLeft, directions: .all).push()
-        case 6:
-            NSCursor.frameResize(position: .bottom, directions: .all).push()
-        case 7:
-            NSCursor.frameResize(position: .bottomRight, directions: .all).push()
-        default:
-            NSCursor.crosshair.push()
-        }
+    
+    func setCursorbyIndex(_ cp: CPoint) {
+        NSCursor.frameResize(position: cp.frameResizePosition, directions: .all).push()
     }
 }
